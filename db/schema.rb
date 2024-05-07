@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_07_161623) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_07_163741) do
   create_table "companies", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", options: "ENGINE=InnoDB ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.string "name", null: false
     t.integer "employee_count"
@@ -21,12 +21,13 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_07_161623) do
   end
 
   create_table "deals", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", options: "ENGINE=InnoDB ROW_FORMAT=DYNAMIC", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.integer "amount"
-    t.string "status"
+    t.string "old_status"
     t.bigint "company_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.column "status", "enum('pending','won','lost')"
     t.index ["company_id"], name: "index_deals_on_company_id"
   end
 

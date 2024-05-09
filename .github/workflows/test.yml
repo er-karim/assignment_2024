@@ -1,6 +1,8 @@
 name: Test
 
-on: [pull_request]
+on:
+  pull_request:
+    branches: [main]
 
 jobs:
   build:
@@ -12,8 +14,9 @@ jobs:
         env:
           MYSQL_HOST: 127.0.0.1
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: my_app_test
         ports:
-          - "3306:3306"
+          - 3307:3306
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
@@ -38,17 +41,19 @@ jobs:
 
       - name: Install dependencies
         run: |
-          apt install libmysqlclient-dev
+          sudo apt-get -yqq install default-libmysqlclient-dev default-mysql-client
           gem install bundler
           bundle install
           yarn install
+
+      - name: Setup Database
+        run: |
+          bundle exec rake db:prepare
 
       - name: Run tests
         env:
           RAILS_ENV: test
           DATABASE_PORT: 3306
         run: |
-          sudo service mysql start
-          bundle exec rails db:prepare
           bundle exec rspec
           yarn test

@@ -12,9 +12,8 @@ jobs:
       mysql:
         image: mysql:latest
         env:
-          MYSQL_HOST: 127.0.0.1
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: my_app_test
+          MYSQL_DATABASE: homework_assignment_2024_test
         ports:
           - 3307:3306
         options: >-
@@ -47,6 +46,8 @@ jobs:
           yarn install
 
       - name: Setup Database
+        env:
+          DB_CONFIG_SOCKET: /var/run/mysqld/mysqld.sock
         run: |
           bundle exec rake db:prepare
 

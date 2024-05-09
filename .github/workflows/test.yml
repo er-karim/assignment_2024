@@ -38,6 +38,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          apt install libmysqlclient-dev
           gem install bundler
           bundle install
           yarn install

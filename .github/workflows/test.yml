@@ -11,12 +11,15 @@ jobs:
         image: mysql:latest
         env:
           MYSQL_HOST: 127.0.0.1
-          MYSQL_DB: github_actions_test
           MYSQL_USER: root
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_PASSWORD:
         ports:
           - "3306:3306"
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
       - name: Checkout code
@@ -36,6 +39,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          gem install bundler
           bundle install
           yarn install
 
@@ -44,7 +48,7 @@ jobs:
           RAILS_ENV: test
           DATABASE_PORT: 3306
         run: |
-          bin/rails db:create
-          bin/rails db:schema:load
+          sudo service mysql start
+          bundle exec rails db:prepare
           bundle exec rspec
           yarn test

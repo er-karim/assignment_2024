@@ -1,9 +1,15 @@
 import { debounce } from "lodash";
 import React, { useEffect, useState } from "react";
+import SearchFilters from "./SearchFilters";
+import CompanyList from "./CompanyList";
+import Pagination from "./Pagination";
+import ErrorAlert from "./ErrorAlert";
 
 export default () => {
   // List of fetched companies
   const [companies, setCompanies] = useState([]);
+  // State for error message
+  const [errorMessage, setErrorMessage] = useState("");
 
   // State for input values and pagination
   const [filters, setFilters] = useState({
@@ -60,8 +66,12 @@ export default () => {
       .then((res) => {
         setCompanies(res.data);
         setTotalPages(res.meta.total_pages);
+        setErrorMessage("");
       })
-      .catch((error) => console.error("Error fetching data:", error));
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setErrorMessage(`Error fetching data: ${error.message}`);
+      });
   };
 
   // Effect to fetch data when filters change
@@ -90,113 +100,20 @@ export default () => {
   return (
     <div className="vw-100 primary-color d-flex align-items-center justify-content-center">
       <div className="jumbotron jumbotron-fluid bg-transparent">
-        <div className="container secondary-color">
+        <div className="container secondary-color" data-testid="home-container">
           <h1 className="display-4">Companies</h1>
 
-          <label htmlFor="company-name">Company Name</label>
-          <div className="input-group mb-3">
-            <input
-              type="text"
-              className="form-control"
-              id="company-name"
-              value={filters.companyName}
-              onChange={(e) =>
-                setFilters({ ...filters, companyName: e.target.value })
-              }
-            />
-          </div>
+          <SearchFilters filters={filters} setFilters={setFilters} />
 
-          <label htmlFor="industry">Industry</label>
-          <div className="input-group mb-3">
-            <input
-              type="text"
-              className="form-control"
-              id="industry"
-              value={filters.industry}
-              onChange={(e) =>
-                setFilters({ ...filters, industry: e.target.value })
-              }
-            />
-          </div>
+          <ErrorAlert errorMessage={errorMessage} />
 
-          <label htmlFor="min-employee">Minimum Employee Count</label>
-          <div className="input-group mb-3">
-            <input
-              type="text"
-              className="form-control"
-              id="min-employee"
-              value={filters.minEmployee}
-              onChange={(e) =>
-                setFilters({ ...filters, minEmployee: e.target.value })
-              }
-            />
-          </div>
+          <CompanyList companies={companies} />
 
-          <label htmlFor="min-amount">Minimum Deal Amount</label>
-          <div className="input-group mb-3">
-            <input
-              type="text"
-              className="form-control"
-              id="min-amount"
-              value={filters.minimumDealAmount}
-              onChange={(e) =>
-                setFilters({ ...filters, minimumDealAmount: e.target.value })
-              }
-            />
-          </div>
-
-          <table className="table">
-            <thead>
-              <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Industry</th>
-                <th scope="col">Employee Count</th>
-                <th scope="col">Total Deal Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {companies.map((company) => (
-                <tr key={company.id}>
-                  <td>{company.name}</td>
-                  <td>{company.industry}</td>
-                  <td>{company.employee_count}</td>
-                  <td>{company.total_deal_amount}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <nav aria-label="Page navigation">
-            <ul className="pagination justify-content-end">
-              <li
-                className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
-              >
-                <a
-                  className="page-link"
-                  href="#"
-                  aria-label="Previous"
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                >
-                  <span aria-hidden="true">&laquo;</span>
-                </a>
-              </li>
-              {paginationLinks}
-              <li
-                className={`page-item ${
-                  currentPage === totalPages ? "disabled" : ""
-                }`}
-              >
-                <a
-                  className="page-link"
-                  href="#"
-                  aria-label="Next"
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                >
-                  <span aria-hidden="true">&raquo;</span>
-                </a>
-              </li>
-            </ul>
-          </nav>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            setCurrentPage={setCurrentPage}
+          />
         </div>
       </div>
     </div>

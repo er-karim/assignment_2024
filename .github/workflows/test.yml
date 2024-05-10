@@ -47,7 +47,7 @@ jobs:
 
       - name: Setup Database
         env:
-          DB_CONFIG_SOCKET: /var/run/mysqld/mysqld.sock
+          RAILS_ENV: test
         run: |
           bundle exec rake db:prepare
 

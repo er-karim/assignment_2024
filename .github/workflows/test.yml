@@ -1,0 +1,61 @@
+name: Test
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: homework_assignment_2024_test
+          MYSQL_PORT: 3307
+        ports:
+          - 3307:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2.2"
+          bundler: default
+          bundler-cache: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22.1.0"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get -yqq install default-libmysqlclient-dev default-mysql-client
+          gem install bundler
+          bundle install
+          yarn install
+
+      - name: Setup Database
+        env:
+          RAILS_ENV: test
+        run: |
+          bundle exec rake db:prepare
+
+      - name: Run tests
+        env:
+          RAILS_ENV: test
+        run: |
+          bundle exec rspec
+          yarn test

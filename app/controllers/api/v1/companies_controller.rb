@@ -1,6 +1,11 @@
 class Api::V1::CompaniesController < ApplicationController
+  RECORDS_PER_PAGE = 10
+
   def index
-    companies = CompanyQuery.new(page, company_params).filter_with_deals
+    companies = CompanyQuery.new(Company.includes(:deals))
+                            .filter_with_minimum_deal_amount(company_params)
+                            .paginate(page:, per_page: RECORDS_PER_PAGE)
+
     total_pages = companies.total_pages
 
     render json: { data: companies.as_json(include: :deals), meta: { total_pages: } }, status: :ok

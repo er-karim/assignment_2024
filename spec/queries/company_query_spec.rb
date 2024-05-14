@@ -1,12 +1,12 @@
 require 'rails_helper'
 
-RSpec.describe CompanyQuery, type: :query do
-  let(:company_params) { {} }
-
-  describe '#filter_with_deals' do
-    subject(:filtered_companies) { described_class.new(1, company_params).filter_with_deals }
+RSpec.describe CompanyQuery do
+  describe '#filter_with_minimum_deal_amount' do
+    subject(:filtered_companies) { described_class.new.filter_with_minimum_deal_amount(company_params) }
 
     context 'when no filters are applied' do
+      let(:company_params) {}
+
       it 'returns all companies with deals' do
         create_list(:company, 10, :with_deals)
         expect(filtered_companies.length).to eq(10)

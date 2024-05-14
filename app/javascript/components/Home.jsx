@@ -32,13 +32,6 @@ export default () => {
     return input.trim();
   };
 
-  const handleInputChange = (key, value) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [key]: sanitizeInput(value),
-    }));
-  };
-
   // Fetch data from API
   const fetchData = () => {
     const sanitizedCompanyName = sanitizeInput(filters.companyName);
@@ -84,18 +77,6 @@ export default () => {
   useEffect(() => {
     fetchData();
   }, [currentPage]);
-
-  // Pagination Links Generation
-  const paginationLinks = [];
-  for (let i = 1; i <= totalPages; i++) {
-    paginationLinks.push(
-      <li key={i} className={`page-item ${currentPage === i ? "active" : ""}`}>
-        <a className="page-link" href="#" onClick={() => setCurrentPage(i)}>
-          {i}
-        </a>
-      </li>
-    );
-  }
 
   return (
     <div className="vw-100 primary-color d-flex align-items-center justify-content-center">
